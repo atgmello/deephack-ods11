@@ -8,9 +8,9 @@ Repositório do time #16, composto por @gustavoem e @atgmello, destinado ao Deep
 
 A maior parte dos arquivos nesse repositório se encontram nas pastas `src` ou `notebooks`.
 Em `src`:
-* `balanco_municipal_tce` - contém um módulo Python para recuperação, agrupamento e análise de dados do [transparencia.tce.sp.gov.br](site do TCE). Com esse pacote é possível obter despesas por cidade e por ano, agrupado pelo tipo de despesa; tambm é possível agrupar dados históricos para analisar como gastos de uma cidade evolui ao longo dos anos.
-* `cdhudf` - módulo Python para recuperação, agrupamento e análise de dados da [https://servicodados.ibge.gov.br/api/docs](API do IBGE). Mais especificamente, por enquanto apenas foi implementado a recuperação de dados de Pesquisas.
-* `ibgedf` - módulo Python para recuperação, agrupamento e análise de dados do [www.cdhu.sp.gov.br](site do CDHU).
+* `balanco_municipal_tce` - contém um módulo Python para recuperação, agrupamento e análise de dados do [site do TCE](transparencia.tce.sp.gov.br). Com esse pacote é possível obter despesas por cidade e por ano, agrupado pelo tipo de despesa; tambm é possível agrupar dados históricos para analisar como gastos de uma cidade evolui ao longo dos anos.
+* `cdhudf` - módulo Python para recuperação, agrupamento e análise de dados da [API do IBGE](https://servicodados.ibge.gov.br/api/docs). Mais especificamente, por enquanto apenas foi implementado a recuperação de dados de Pesquisas.
+* `ibgedf` - módulo Python para recuperação, agrupamento e análise de dados do [site do CDHU](www.cdhu.sp.gov.br).
 
 Em `notebooks`:
 * `exploracao_inicial.ipynb` - compilação de links úteis relacionados ao Objetivo 11 e bases de dados online que foram inicialmente consideradas.
