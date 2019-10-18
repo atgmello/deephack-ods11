@@ -19,6 +19,10 @@ Em `notebooks`:
 * `classifying_expenses.ipynb` - is an example of application of machine learning using data fetched by `balanco_municipal_tce` - nesse notebook utilizamos processamento de linguagem natural, mais especificamente o framework ```fasttext```, para criar um procedimento de aprendizado supervisionado que permite a classificação dos temas dos gastos de um município.
 * `cross_report.ipynb` - esse notebook contém uma análise de dados exploratória através do cruzamento das diferentes bases de dados suportadas pelos módulos desenvolvidos.
 
+Note que os notebooks mais importantes, portanto, são: `cross_report.ipynb` e `classifying_expenses.ipynb`, seguidos dos `*_examples.ipynb`. Os demais notebooks contam com uma exploração menos estruturada dos dados. 
+
+Para facilitar o acesso e visualização dos notebooks, recomendamos a tulizaço do Nbviewer, através do link:
+https://nbviewer.jupyter.org/github/atgmello/deephack-ods11/tree/master/notebooks/
 
 ---
 
