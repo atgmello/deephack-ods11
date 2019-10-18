@@ -1,3 +1,6 @@
 */.ipynb_checkpoints/*
 data/*
-__pycache__/
+__pycache__/*
+*.log
+test*
+charts/*
