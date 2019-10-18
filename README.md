@@ -21,7 +21,7 @@ Em `notebooks`:
 
 Note que os notebooks mais importantes, portanto, são: `cross_report.ipynb` e `classifying_expenses.ipynb`, seguidos dos `*_examples.ipynb`. Os demais notebooks contam com uma exploração menos estruturada dos dados. 
 
-Para facilitar o acesso e visualização dos notebooks, recomendamos a tulizaço do Nbviewer, através do link:
+Para facilitar o acesso e visualização dos notebooks, recomendamos a utilização do Nbviewer, através do link:
 https://nbviewer.jupyter.org/github/atgmello/deephack-ods11/tree/master/notebooks/
 
 ---
