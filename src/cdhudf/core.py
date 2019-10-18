@@ -9,6 +9,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 import pandas as pd
+import unidecode as uni
+import difflib
+import re
 from .utils import *
 
 def preproc_df(df, agg=True, mun_col=False):
@@ -22,7 +25,16 @@ def preproc_df(df, agg=True, mun_col=False):
         pass
 
     df.columns = [c.strip() for c in df.columns]
-    df.drop(index=(len(df)-1), inplace=True)
+
+    # Fix spelling error
+    filter_spell = df['Empreendimento']=="Sao Luiz do Paraitinga - Microcredito".upper()
+    i = df[filter_spell].index[0]
+    df.loc[i,'Empreendimento'] = "Sao Luis do Paraitinga - Microcredito".upper()
+
+    # Fix spelling error
+    filter_spell = df['Empreendimento']=="SAO LUIZ DO PARAITINGA C"
+    i = df[filter_spell].index[0]
+    df.loc[i,'Empreendimento'] = "SAO LUIS DO PARAITINGA C"
 
     df['Data de Entrega'] = pd.to_datetime(df['Data de Entrega'])
     df['Total de UHS'] = pd.to_numeric(df['Total de UHS'])
@@ -32,29 +44,53 @@ def preproc_df(df, agg=True, mun_col=False):
     if agg:
         df.insert(3, 'Ano de Entrega', df['Data de Entrega'].dt.year)
         df.insert(4, 'Mês de Entrega', df['Data de Entrega'].dt.month)
-
-        df = df.sort_values(by='Ano de Entrega').reset_index(drop=True)
-        df['Acumulado Total de UHS'] = df['Total de UHS'].cumsum()
-        df['Acumulado Total de CCs'] = df['Total de CCs'].cumsum()
-        df["Acumulado Total de Fam (Urb)"] = df["Total de Fam (Urb)"].cumsum()
-
         if mun_col:
-            mun_dict = get_unidecode_dict(get_mun())
+            mun_dict = get_unidecode_dict(
+                get_options_dropdown(category='mun'))
             def municipio(s):
+                s = s.lower()
                 mun = s.split()[0].capitalize()
                 i = 1
-                while mun not in list(mun_dict.keys()) and i < len(mun):
-                    mun = " ".join(s.split()[:i]).title()
+                while mun not in (list(mun_dict.keys()) + list(mun_dict.values())) and i < len(mun):
+                    mun = s.split()[:i]
+                    mun_cap = []
+                    for word in mun:
+                        mun_cap.append(word.capitalize())
+                    mun = " ".join(mun_cap)
+
                     i+=1
 
-                return mun_dict[mun]
+                mun = uni.unidecode(mun)
+                try:
+                    municipio = mun_dict[mun]
+                except:
+                    # Failed
+                    # Check if it's from São Paulo using regex.
+                    # If not, try using string similarity
+                    # Compares with keys (unidecoded string) rather than with
+                    # values (unicode string), just to ensure more compatibility
+
+                    mun = mun.split('-')[0]
+                    if re.match("^Sp", mun):
+                        municipio = "São Paulo"
+                    else:
+                        scores = []
+                        for m in mun_dict.keys():
+                            s = difflib.SequenceMatcher(None, m, mun).ratio()
+                            scores.append(s)
+                        index = scores.index(max(scores))
+                        mun = list(mun_dict.keys())[index]
+                        municipio = mun_dict[mun]
+                    pass
+
+                return municipio
 
             df.insert(0, 'Município', df['Empreendimento'].apply(municipio))
 
     return df
 
 
-def get_df(municipio='all', driver=None, tmp_path = '/tmp/cdhu', verbose=True):
+def get_df(search='Adamantina', category='mun', driver=None, tmp_path = '/tmp/cdhu', verbose=True):
     """
     Clean tmp dir for downloading files
     """
@@ -76,9 +112,14 @@ def get_df(municipio='all', driver=None, tmp_path = '/tmp/cdhu', verbose=True):
         print(e)
         driver.quit()
 
-    id_municipio_dropdown = driver.\
-                find_element_by_id('_ProducaoHabitacional_WAR_ProducaoHabitacional_:form:municipio')
-    select = Select(id_municipio_dropdown)
+    if category == 'mun':
+        id_dropdown = driver.\
+            find_element_by_id('_ProducaoHabitacional_WAR_ProducaoHabitacional_:form:municipio')
+    elif category == 'radm':
+        id_dropdown = driver.\
+            find_element_by_id('_ProducaoHabitacional_WAR_ProducaoHabitacional_:form:regiaoAdministrativa')
+
+    select = Select(id_dropdown)
 
     today = date.today()
     date_ini = driver.find_element_by_id('dataini')
@@ -87,10 +128,10 @@ def get_df(municipio='all', driver=None, tmp_path = '/tmp/cdhu', verbose=True):
     date_ini.send_keys("01/01/1986")
     date_end.send_keys(today.strftime("%d/%m/%Y"))
 
-    print('Coletando dados de {}...'.format(municipio)) if verbose else False
+    print('Coletando dados de {}...'.format(search)) if verbose else False
 
     try:
-        select.select_by_value(municipio)
+        select.select_by_value(search)
     except Exception as e:
         print(e)
         return pd.DataFrame()
